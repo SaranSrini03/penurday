@@ -1,6 +1,5 @@
 // components/NebulaEffects.jsx
-export default function NebulaEffects({ darkMode }) {
-  if (!darkMode) return null;
+export default function NebulaEffects({  }) {
 
   return (
     <>

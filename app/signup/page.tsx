@@ -3,16 +3,19 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 import StarfieldBackground from "@/components/StarfieldBackground";
 import NebulaEffects from "@/components/NebulaEffects";
 
 export default function Signup() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     username: "",
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    dob: "", // added dob
     terms: false,
   });
 
@@ -23,19 +26,22 @@ export default function Signup() {
 
   const validate = () => {
     const newErrors = {};
+    if (!formData.username.trim()) newErrors.username = "Username is required.";
     if (!formData.name.trim()) newErrors.name = "Full name is required.";
     if (!formData.email.trim()) newErrors.email = "Email is required.";
     else if (!/\S+@\S+\.\S+/.test(formData.email))
       newErrors.email = "Email is invalid.";
+    if (!formData.dob) newErrors.dob = "Date of birth is required.";
     if (formData.password.length < 8)
       newErrors.password = "Password must be at least 8 characters.";
     if (formData.confirmPassword !== formData.password)
       newErrors.confirmPassword = "Passwords do not match.";
     if (!formData.terms) newErrors.terms = "You must agree to terms.";
+
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -45,10 +51,39 @@ export default function Signup() {
 
     setErrors({});
     setIsSubmitting(true);
-    setTimeout(() => {
+
+    try {
+      const response = await fetch("/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // alert("Account created successfully!");
+        setFormData({
+          username: "",
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          dob: "",
+          terms: false,
+        });
+        router.push("/login");  // <-- redirect here
+      } else {
+        alert("Signup failed.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred.");
+    } finally {
       setIsSubmitting(false);
-      alert("Account created successfully!");
-    }, 1500);
+    }
   };
 
   const handleChange = (e) => {
@@ -69,12 +104,8 @@ export default function Signup() {
       <NebulaEffects />
       <div className="absolute inset-0 flex items-center justify-center px-4 z-10">
         <div className="w-full max-w-sm bg-zinc-900 rounded-xl shadow-lg p-6 border border-zinc-800 backdrop-blur-md">
-          <h2 className="text-xl font-semibold text-center mb-2">
-            Create Account
-          </h2>
-          <p className="text-sm text-zinc-400 text-center mb-6">
-            Join our community of thinkers
-          </p>
+          <h2 className="text-xl font-semibold text-center mb-2">Create Account</h2>
+          <p className="text-sm text-zinc-400 text-center mb-6">Join our community of thinkers</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
@@ -82,26 +113,30 @@ export default function Signup() {
               placeholder="Username"
               value={formData.username}
               onChange={handleChange}
-              className={`w-full bg-zinc-800 text-white border rounded-md px-3 py-2 text-sm placeholder-zinc-400 ${
-                errors.username ? "border-red-500" : "border-zinc-700"
-              }`}
+              className={`w-full bg-zinc-800 text-white border rounded-md px-3 py-2 text-sm placeholder-zinc-400 ${errors.username ? "border-red-500" : "border-zinc-700"
+                }`}
             />
-            {errors.username && (
-              <p className="text-sm text-red-500">{errors.username}</p>
-            )}
+            {errors.username && <p className="text-sm text-red-500">{errors.username}</p>}
 
             <input
               name="name"
               placeholder="Full Name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full bg-zinc-800 text-white border rounded-md px-3 py-2 text-sm placeholder-zinc-400 ${
-                errors.name ? "border-red-500" : "border-zinc-700"
-              }`}
+              className={`w-full bg-zinc-800 text-white border rounded-md px-3 py-2 text-sm placeholder-zinc-400 ${errors.name ? "border-red-500" : "border-zinc-700"
+                }`}
             />
-            {errors.name && (
-              <p className="text-sm text-red-500">{errors.name}</p>
-            )}
+            {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+
+            <input
+              name="dob"
+              type="date"
+              value={formData.dob}
+              onChange={handleChange}
+              className={`w-full bg-zinc-800 text-white border rounded-md px-3 py-2 text-sm placeholder-zinc-400 ${errors.dob ? "border-red-500" : "border-zinc-700"
+                }`}
+            />
+            {errors.dob && <p className="text-sm text-red-500">{errors.dob}</p>}
 
             <input
               name="email"
@@ -109,13 +144,10 @@ export default function Signup() {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full bg-zinc-800 text-white border rounded-md px-3 py-2 text-sm placeholder-zinc-400 ${
-                errors.email ? "border-red-500" : "border-zinc-700"
-              }`}
+              className={`w-full bg-zinc-800 text-white border rounded-md px-3 py-2 text-sm placeholder-zinc-400 ${errors.email ? "border-red-500" : "border-zinc-700"
+                }`}
             />
-            {errors.email && (
-              <p className="text-sm text-red-500">{errors.email}</p>
-            )}
+            {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
 
             {/* Password */}
             <div className="relative">
@@ -125,9 +157,8 @@ export default function Signup() {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full bg-zinc-800 text-white border rounded-md px-3 py-2 text-sm placeholder-zinc-400 ${
-                  errors.password ? "border-red-500" : "border-zinc-700"
-                }`}
+                className={`w-full bg-zinc-800 text-white border rounded-md px-3 py-2 text-sm placeholder-zinc-400 ${errors.password ? "border-red-500" : "border-zinc-700"
+                  }`}
               />
               <button
                 type="button"
@@ -137,9 +168,7 @@ export default function Signup() {
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-sm text-red-500">{errors.password}</p>
-            )}
+            {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
 
             {/* Confirm Password */}
             <div className="relative">
@@ -149,11 +178,8 @@ export default function Signup() {
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`w-full bg-zinc-800 text-white border rounded-md px-3 py-2 text-sm placeholder-zinc-400 ${
-                  errors.confirmPassword
-                    ? "border-red-500"
-                    : "border-zinc-700"
-                }`}
+                className={`w-full bg-zinc-800 text-white border rounded-md px-3 py-2 text-sm placeholder-zinc-400 ${errors.confirmPassword ? "border-red-500" : "border-zinc-700"
+                  }`}
               />
               <button
                 type="button"
@@ -175,7 +201,7 @@ export default function Signup() {
                 type="checkbox"
                 checked={formData.terms}
                 onChange={handleChange}
-                className="h-4 w-4 rounded bg-zinc-800 border-zinc-700"
+                className="h-4 w-4 rounded bg-zinc-800 border border-zinc-700"
               />
               <label htmlFor="terms">
                 I agree to the{" "}
@@ -188,15 +214,13 @@ export default function Signup() {
                 </a>
               </label>
             </div>
-            {errors.terms && (
-              <p className="text-sm text-red-500">{errors.terms}</p>
-            )}
+            {errors.terms && <p className="text-sm text-red-500">{errors.terms}</p>}
 
             {/* Submit */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-[#8c70cc] to-[#2b97b8]  cursor-pointer hover:bg-blue-700 text-white text-sm font-medium py-2 rounded-full transition"
+              className="w-full bg-gradient-to-r from-[#8c70cc] to-[#2b97b8] cursor-pointer hover:bg-blue-700 text-white text-sm font-medium py-2 rounded-full transition disabled:opacity-50"
             >
               {isSubmitting ? "Creating Account..." : "Sign Up"}
             </button>

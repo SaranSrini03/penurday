@@ -2,11 +2,10 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-export default function StarfieldBackground({ darkMode }) {
+export default function StarfieldBackground({  }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (!darkMode) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -90,7 +89,7 @@ export default function StarfieldBackground({ darkMode }) {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrame);
     };
-  }, [darkMode]);
+  }, []);
 
   return (
     <canvas 
