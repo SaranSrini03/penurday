@@ -1,13 +1,12 @@
 "use client";
 import Link from "next/link";
 import { Moon, Sun } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect} from "react";
 import StarfieldBackground from "@/components/StarfieldBackground";
 import NebulaEffects from "@/components/NebulaEffects";
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
-  const canvasRef = useRef(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -35,8 +34,8 @@ export default function Home() {
             : "bg-gradient-to-br from-[#faf8f5] to-[#f0ecfe] text-[#1e1e1e]"
         }`}
       >
-        <StarfieldBackground darkMode={darkMode} />
-        <NebulaEffects darkMode={darkMode} />
+        <StarfieldBackground  />
+        <NebulaEffects />
 
         {/* Dark mode toggle */}
         <button
@@ -67,7 +66,7 @@ export default function Home() {
                   darkMode ? "text-gray-300" : "text-gray-600"
                 }`}
               >
-                Doesn't matter if it's Thursday or Monday — every day is Penurday. Share raw, real thoughts. A notepad, but social. For the days that feel too real to filter.
+                Doesn&apos;t matter if it&apos;s Thursday or Monday — every day is Penurday. Share raw, real thoughts. A notepad, but social. For the days that feel too real to filter.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 justify-center lg:justify-start">

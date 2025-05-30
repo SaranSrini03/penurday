@@ -6,7 +6,6 @@ import { ArrowLeft, Search, Plus, Heart, MessageSquare, Repeat, Send, MoreVertic
 import StarfieldBackground from "@/components/StarfieldBackground";
 import NebulaEffects from "@/components/NebulaEffects";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
 
 export default function HomePage() {
   const [darkMode, setDarkMode] = useState(false);
@@ -17,7 +16,6 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState("forYou");
   const [showSidebar, setShowSidebar] = useState(false);
   const modalRef = useRef(null);
-  const router = useRouter();
 
 
 const handleLogout = () => {
