@@ -5,6 +5,7 @@ import Home from "@/components/Home";
 import { useEffect, useState } from "react";
 
 export default function LandingPage() {
+  
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
