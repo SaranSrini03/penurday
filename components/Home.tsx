@@ -2,26 +2,42 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import React from "react";
 import { ArrowLeft, Search, Plus, Heart, MessageSquare, Repeat, Send, MoreVertical, Home, User, Bell, Bookmark, Settings, LogOut } from "lucide-react";
 import StarfieldBackground from "@/components/StarfieldBackground";
 import NebulaEffects from "@/components/NebulaEffects";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface Post {
+  id: number;
+  username: string;
+  name: string;
+  content: string;
+  timestamp: string;
+  likes: number;
+  replies: number;
+  reposts: number;
+  avatar: string;
+}
+
+
 export default function HomePage() {
   const [darkMode, setDarkMode] = useState(false);
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = React.useState<Post[]>([]);
+
   const [newPost, setNewPost] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [activeTab, setActiveTab] = useState("forYou");
   const [showSidebar, setShowSidebar] = useState(false);
-  const modalRef = useRef(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
 
-const handleLogout = () => {
-  localStorage.removeItem("token");
-  window.location.reload(); // reloads the current page
-};
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.reload(); // reloads the current page
+  };
 
 
 
@@ -105,7 +121,7 @@ const handleLogout = () => {
   }, [darkMode]);
 
   // Handle post submission
-  const handleSubmitPost = (e) => {
+  const handleSubmitPost = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newPost.trim()) return;
 
@@ -133,7 +149,7 @@ const handleLogout = () => {
   };
 
   // Handle like action
-  const handleLike = (id) => {
+  const handleLike = (id: number) => {
     setPosts(posts.map(post =>
       post.id === id ? { ...post, likes: post.likes + 1 } : post
     ));
@@ -141,11 +157,12 @@ const handleLogout = () => {
 
   // Close modal when clicking outside
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (modalRef.current && !modalRef.current.contains(e.target)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
         setShowCreateModal(false);
       }
     };
+
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -153,9 +170,9 @@ const handleLogout = () => {
 
   return (
     <div
-      className={`relative min-h-screen flex flex-col overflow-hidden transition-colors duration-500 ${darkMode
-          ? "bg-gradient-to-br from-[#000000] to-[#0a0a2a] text-gray-200"
-          : "bg-gradient-to-br from-[#faf8f5] to-[#f0ecfe] text-[#1e1e1e]"
+      className={`relative min-h-screen flex flex-col overflow-hidden m-colors duration-500 ${darkMode
+        ? "bg-gradient-to-br from-[#000000] to-[#0a0a2a] text-gray-200"
+        : "bg-gradient-to-br from-[#faf8f5] to-[#f0ecfe] text-[#1e1e1e]"
         }`}
     >
       {/* Background effects */}
@@ -180,8 +197,8 @@ const handleLogout = () => {
             <button
               onClick={() => setShowCreateModal(true)}
               className={`p-2 rounded-full transition-colors duration-300 ${darkMode
-                  ? "bg-[#3a2a7c] hover:bg-[#4a3a9c] text-yellow-300"
-                  : "bg-[#f0ecfe] hover:bg-[#e5dfff] text-[#5c3aff]"
+                ? "bg-[#3a2a7c] hover:bg-[#4a3a9c] text-yellow-300"
+                : "bg-[#f0ecfe] hover:bg-[#e5dfff] text-[#5c3aff]"
                 }`}
               aria-label="Create new thread"
             >
@@ -192,8 +209,8 @@ const handleLogout = () => {
               onClick={() => setDarkMode(!darkMode)}
               aria-label="Toggle dark mode"
               className={`p-2 rounded-full transition-colors duration-300 ${darkMode
-                  ? "bg-[#3a2a7c] hover:bg-[#4a3a9c] text-yellow-300"
-                  : "bg-[#f0ecfe] hover:bg-[#e5dfff] text-[#5c3aff]"
+                ? "bg-[#3a2a7c] hover:bg-[#4a3a9c] text-yellow-300"
+                : "bg-[#f0ecfe] hover:bg-[#e5dfff] text-[#5c3aff]"
                 }`}
             >
               {darkMode ? (
@@ -240,8 +257,8 @@ const handleLogout = () => {
             <button
               onClick={() => setShowSidebar(true)}
               className={`p-1.5 rounded-full transition-colors duration-300 ${darkMode
-                  ? "bg-[#3a2a7c] hover:bg-[#4a3a9c]"
-                  : "bg-[#f0ecfe] hover:bg-[#e5dfff]"
+                ? "bg-[#3a2a7c] hover:bg-[#4a3a9c]"
+                : "bg-[#f0ecfe] hover:bg-[#e5dfff]"
                 }`}
               aria-label="Open menu"
             >
@@ -260,10 +277,10 @@ const handleLogout = () => {
           }`}>
           <button
             className={`flex-1 py-2.5 rounded-xl text-center transition-colors duration-300 ${activeTab === "forYou"
-                ? darkMode
-                  ? "bg-[#3a2a7c] text-white"
-                  : "bg-white text-[#5c3aff] shadow-sm"
-                : ""
+              ? darkMode
+                ? "bg-[#3a2a7c] text-white"
+                : "bg-white text-[#5c3aff] shadow-sm"
+              : ""
               }`}
             onClick={() => setActiveTab("forYou")}
           >
@@ -271,10 +288,10 @@ const handleLogout = () => {
           </button>
           <button
             className={`flex-1 py-2.5 rounded-xl text-center transition-colors duration-300 ${activeTab === "following"
-                ? darkMode
-                  ? "bg-[#3a2a7c] text-white"
-                  : "bg-white text-[#5c3aff] shadow-sm"
-                : ""
+              ? darkMode
+                ? "bg-[#3a2a7c] text-white"
+                : "bg-white text-[#5c3aff] shadow-sm"
+              : ""
               }`}
             onClick={() => setActiveTab("following")}
           >
@@ -292,8 +309,8 @@ const handleLogout = () => {
             <button
               onClick={() => setShowCreateModal(true)}
               className={`flex-1 text-left p-3 rounded-xl transition-colors duration-300 ${darkMode
-                  ? "bg-[#1a1538] hover:bg-[#2a1e5c] text-gray-400"
-                  : "bg-[#f0ecfe] hover:bg-[#e5dfff] text-gray-500"
+                ? "bg-[#1a1538] hover:bg-[#2a1e5c] text-gray-400"
+                : "bg-[#f0ecfe] hover:bg-[#e5dfff] text-gray-500"
                 }`}
             >
               Start a cosmic thread...
@@ -377,8 +394,8 @@ const handleLogout = () => {
           <button
             onClick={() => setShowCreateModal(true)}
             className={`p-3 rounded-full ${darkMode
-                ? "bg-[#3a2a7c] text-yellow-300"
-                : "bg-[#f0ecfe] text-[#5c3aff]"
+              ? "bg-[#3a2a7c] text-yellow-300"
+              : "bg-[#f0ecfe] text-[#5c3aff]"
               }`}
           >
             <Plus size={24} />
@@ -430,8 +447,8 @@ const handleLogout = () => {
                       onChange={(e) => setNewPost(e.target.value)}
                       placeholder="Share your cosmic thoughts..."
                       className={`w-full min-h-[120px] p-3 rounded-xl focus:outline-none focus:ring-2 transition-colors duration-300 ${darkMode
-                          ? "bg-[#1a1538] border border-[#3a2a7c] text-white focus:ring-[#8c70cc]"
-                          : "bg-[#f0ecfe] border border-[#eae6fc] text-gray-900 focus:ring-[#5c3aff]"
+                        ? "bg-[#1a1538] border border-[#3a2a7c] text-white focus:ring-[#8c70cc]"
+                        : "bg-[#f0ecfe] border border-[#eae6fc] text-gray-900 focus:ring-[#5c3aff]"
                         }`}
                     />
                     <p className={`mt-2 text-right text-sm ${darkMode ? "text-gray-400" : "text-gray-500"
@@ -446,8 +463,8 @@ const handleLogout = () => {
                     type="submit"
                     disabled={isPosting || !newPost.trim()}
                     className={`px-4 py-2.5 rounded-xl font-bold transition-colors duration-300 flex items-center gap-2 ${darkMode
-                        ? "bg-gradient-to-r from-[#8c70cc] to-[#2b97b8] hover:from-[#9b7ddb] hover:to-[#3aa4ce] text-white disabled:opacity-70"
-                        : "bg-gradient-to-r from-[#5c3aff] to-[#2b97b8] hover:from-[#6d4aff] hover:to-[#3aa4ce] text-white disabled:opacity-70"
+                      ? "bg-gradient-to-r from-[#8c70cc] to-[#2b97b8] hover:from-[#9b7ddb] hover:to-[#3aa4ce] text-white disabled:opacity-70"
+                      : "bg-gradient-to-r from-[#5c3aff] to-[#2b97b8] hover:from-[#6d4aff] hover:to-[#3aa4ce] text-white disabled:opacity-70"
                       }`}
                   >
                     {isPosting ? (
@@ -542,8 +559,8 @@ const handleLogout = () => {
                         </div>
                       </div>
                       <button className={`px-3 py-1 rounded-full text-sm font-medium transition-colors duration-300 ${darkMode
-                          ? "bg-[#3a2a7c] hover:bg-[#4a3a9c]"
-                          : "bg-[#5c3aff] text-white"
+                        ? "bg-[#3a2a7c] hover:bg-[#4a3a9c]"
+                        : "bg-[#5c3aff] text-white"
                         }`}>
                         Follow
                       </button>

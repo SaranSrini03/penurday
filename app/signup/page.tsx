@@ -19,13 +19,15 @@ export default function Signup() {
     terms: false,
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
-    const newErrors = {};
+    const newErrors: { [key: string]: string } = {};
+
     if (!formData.username.trim()) newErrors.username = "Username is required.";
     if (!formData.name.trim()) newErrors.name = "Full name is required.";
     if (!formData.email.trim()) newErrors.email = "Email is required.";
@@ -41,7 +43,7 @@ export default function Signup() {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -86,17 +88,14 @@ export default function Signup() {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value, type, checked } = e.target;
+  setFormData((prev) => ({
+    ...prev,
+    [name]: type === "checkbox" ? checked : value,
+  }));
+};
 
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
-  };
 
   return (
     <div className="relative min-h-screen bg-black text-white">

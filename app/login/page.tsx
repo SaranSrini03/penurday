@@ -76,9 +76,14 @@ export default function Login() {
     }));
 
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
     }
   };
+
 
   return (
     <div className="relative min-h-screen bg-black text-white">
