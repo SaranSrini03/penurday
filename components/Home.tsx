@@ -6,7 +6,7 @@ import {
   ArrowLeft, Search, Plus, Heart, MessageSquare, Repeat, Send,
   MoreVertical, Home, Bell
 } from "lucide-react";
-
+import UserDetails from "@/components/UserDetails"; 
 import StarfieldBackground from "@/components/StarfieldBackground";
 import NebulaEffects from "@/components/NebulaEffects";
 import { motion, AnimatePresence } from "framer-motion";
@@ -164,8 +164,9 @@ export default function HomePage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // const initial = <UserDetails detail="username" format="initial" />
-  const initial = user?.username.charAt(0).toUpperCase() || "";
+
+     const initial = <UserDetails detail="username" format="initial" />
+ 
 
 
 
@@ -206,7 +207,6 @@ export default function HomePage() {
         setDarkMode={setDarkMode}
         setShowCreateModal={setShowCreateModal}
         setShowSidebar={setShowSidebar}
-        initial={initial}
       />
 
 
@@ -434,7 +434,6 @@ export default function HomePage() {
         showSidebar={showSidebar}
         setShowSidebar={setShowSidebar}
         darkMode={darkMode}
-        initial={initial}
         handleLogout={handleLogout}
       />
 

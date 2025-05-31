@@ -2,13 +2,13 @@
 
 import { Plus } from "lucide-react";
 import React from "react";
+import UserDetails from "@/components/UserDetails";
 
 interface TopNavProps {
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
   setShowCreateModal: (value: boolean) => void;
   setShowSidebar: (value: boolean) => void;
-  initial: string;
 }
 
 export default function TopNav({
@@ -16,8 +16,9 @@ export default function TopNav({
   setDarkMode,
   setShowCreateModal,
   setShowSidebar,
-  initial,
 }: TopNavProps) {
+  const initial = <UserDetails detail="username" format="initial" />
+  
   return (
     <header
       className={`sticky top-0 z-30 py-3 px-4 backdrop-blur-lg border-b transition-colors duration-300 ${
@@ -26,6 +27,7 @@ export default function TopNav({
           : "bg-white/95 border-[#eae6fc]"
       }`}
     >
+
       <div className="max-w-4xl mx-auto flex justify-between items-center">
         {/* Logo / Title */}
         <div className="flex items-center gap-2">

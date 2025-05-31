@@ -14,7 +14,6 @@ interface SidebarProps {
     showSidebar: boolean;
     setShowSidebar: (value: boolean) => void;
     darkMode: boolean;
-    initial: string;
     handleLogout: () => void;
 }
 
@@ -22,11 +21,12 @@ export default function Sidebar({
     showSidebar,
     setShowSidebar,
     darkMode,
-    initial,
     handleLogout,
 }: SidebarProps) {
+    const initial = <UserDetails detail="username" format="initial" />
     const { user, loading } = useUser();
     if (loading) return <p>Loading...</p>;
+    
 
     if (!user) return <p>Not logged in</p>;
     console.log("user :",user.username)
