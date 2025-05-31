@@ -66,7 +66,6 @@ export default function Signup() {
       const result = await response.json();
 
       if (result.success) {
-        // alert("Account created successfully!");
         setFormData({
           username: "",
           name: "",

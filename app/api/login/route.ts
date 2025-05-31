@@ -1,4 +1,3 @@
-// app/api/login/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import User from "@/models/User";
@@ -18,7 +17,6 @@ export async function POST(req: NextRequest) {
 
     await connectToDatabase();
 
-    // Find user by username or email
     const user = await User.findOne({
       $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
     });
@@ -30,7 +28,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -38,9 +35,6 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
-
-    // TODO: Here you can create a session or JWT token and return it to the client.
-    // For now, just return success and user data (excluding password).
 
     const userResponse = {
       username: user.username,
@@ -50,7 +44,20 @@ export async function POST(req: NextRequest) {
       createdAt: user.createdAt,
     };
 
-    return NextResponse.json({ success: true, user: userResponse });
+    const response = NextResponse.json({ success: true, user: userResponse });
+
+    // Set cookie named "userEmail"
+    response.cookies.set({
+      name: "userEmail",
+      value: user.email,
+      path: "/",              // accessible site-wide
+      maxAge: 60 * 60 * 24 * 7,  // 7 days
+      httpOnly: false,         // so you can access it in frontend if needed
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    return response;
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(

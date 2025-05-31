@@ -1,4 +1,3 @@
-// app/page.js
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -7,6 +6,10 @@ import { ArrowLeft, Search, Plus, Heart, MessageSquare, Repeat, Send, MoreVertic
 import StarfieldBackground from "@/components/StarfieldBackground";
 import NebulaEffects from "@/components/NebulaEffects";
 import { motion, AnimatePresence } from "framer-motion";
+import UserDetails from "@/components/UserDetails";
+import TopNav from "@/components/TopNav";
+import Sidebar from "@/components/SideBar";
+
 
 interface Post {
   id: number;
@@ -20,86 +23,77 @@ interface Post {
   avatar: string;
 }
 
+// Define User interface
+interface AppUser {
+  _id: string;
+  name: string;
+  username: string;
+  email: string;
+}
 
 export default function HomePage() {
   const [darkMode, setDarkMode] = useState(false);
   const [posts, setPosts] = React.useState<Post[]>([]);
-
   const [newPost, setNewPost] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [activeTab, setActiveTab] = useState("forYou");
   const [showSidebar, setShowSidebar] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<AppUser | null>(null);
 
+  // Fetch user data
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
+      try {
+        const res = await fetch("/api/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.reload(); // reloads the current page
+    window.location.reload();
   };
 
-
-
-
-  // Mock data for posts
+  // Load mock posts once
   useEffect(() => {
     const mockPosts = [
       {
         id: 1,
         username: "space_explorer",
         name: "Csc Voyager",
-        content: "Just witnessed the most incredible nebula formation through my telescope last night. The universe never ceases to amaze!",
+        content:
+          "Just witnessed the most incredible nebula formation through my telescope last night. The universe never ceases to amaze!",
         timestamp: "2h ago",
         likes: 22,
         replies: 8,
         reposts: 3,
         avatar: "🌌",
       },
-      {
-        id: 2,
-        username: "astro_tech",
-        name: "Astro Tech",
-        content: "New telescope technology allows us to see deeper into space than ever before. Can't wait to share our findings at the conference next month!",
-        timestamp: "5h ago",
-        likes: 128,
-        replies: 24,
-        reposts: 17,
-        avatar: "🔭",
-      },
-      {
-        id: 3,
-        username: "galaxy_guru",
-        name: "Galaxy Guru",
-        content: "Did you know that there are more stars in the universe than grains of sand on all Earth's beaches? Mind-blowing cosmic facts!",
-        timestamp: "8h ago",
-        likes: 312,
-        replies: 45,
-        reposts: 29,
-        avatar: "🌠",
-      },
-      {
-        id: 4,
-        username: "quantum_observer",
-        name: "Quantum Observer",
-        content: "Theoretical physics meets practical astronomy in our latest research. Paper coming soon!",
-        timestamp: "12h ago",
-        likes: 87,
-        replies: 12,
-        reposts: 5,
-        avatar: "⚛️",
-      },
-      {
-        id: 5,
-        username: "starlight_writer",
-        name: "Starlight Writer",
-        content: "Writing my next novel under the stars tonight. There's something magical about the cosmos that sparks creativity.",
-        timestamp: "1d ago",
-        likes: 204,
-        replies: 31,
-        reposts: 18,
-        avatar: "📖",
-      },
+
     ];
     setPosts(mockPosts);
   }, []);
@@ -131,8 +125,8 @@ export default function HomePage() {
     setTimeout(() => {
       const newPostObj = {
         id: posts.length + 1,
-        username: "current_user",
-        name: "Cosmic Explorer",
+        username: user?.username || "current_user",
+        name: user?.name || "Cosmic Explorer",
         content: newPost,
         timestamp: "Just now",
         likes: 0,
@@ -150,9 +144,9 @@ export default function HomePage() {
 
   // Handle like action
   const handleLike = (id: number) => {
-    setPosts(posts.map(post =>
-      post.id === id ? { ...post, likes: post.likes + 1 } : post
-    ));
+    setPosts(
+      posts.map((post) => (post.id === id ? { ...post, likes: post.likes + 1 } : post))
+    );
   };
 
   // Close modal when clicking outside
@@ -163,10 +157,27 @@ export default function HomePage() {
       }
     };
 
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const initial = <UserDetails detail="username" format="initial" />
+
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <span className="inline-flex space-x-1">
+          <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:0s]" />
+          <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:0.2s]" />
+          <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:0.4s]" />
+        </span>
+      </div>
+    );
+  }
+
+
+  if (!user) return <div className="min-h-screen flex items-center justify-center text-red-600">Not logged in</div>;
 
   return (
     <div
@@ -185,90 +196,14 @@ export default function HomePage() {
       <div className="absolute top-1/3 right-1/5 w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-teal-500 opacity-30 blur-xl"></div>
 
       {/* Top Navigation */}
-      <header className={`sticky top-0 z-30 py-3 px-4 backdrop-blur-lg border-b transition-colors duration-300 ${darkMode ? "bg-[#0d0a1f]/80 border-[#3a2a7c]" : "bg-white/95 border-[#eae6fc]"
-        }`}>
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <h1 className={`text-xl font-bold ${darkMode ? "text-[#c0b3e5]" : "text-[#5c3aff]"
-              }`}>Penurday</h1>
-          </div>
+      <TopNav
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+        setShowCreateModal={setShowCreateModal}
+        setShowSidebar={setShowSidebar}
+        initial={initial}
+      />
 
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className={`p-2 rounded-full transition-colors duration-300 ${darkMode
-                ? "bg-[#3a2a7c] hover:bg-[#4a3a9c] text-yellow-300"
-                : "bg-[#f0ecfe] hover:bg-[#e5dfff] text-[#5c3aff]"
-                }`}
-              aria-label="Create new thread"
-            >
-              <Plus size={20} />
-            </button>
-
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              aria-label="Toggle dark mode"
-              className={`p-2 rounded-full transition-colors duration-300 ${darkMode
-                ? "bg-[#3a2a7c] hover:bg-[#4a3a9c] text-yellow-300"
-                : "bg-[#f0ecfe] hover:bg-[#e5dfff] text-[#5c3aff]"
-                }`}
-            >
-              {darkMode ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  viewBox="0 0 24 24"
-                  className="animate-pulse"
-                >
-                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  viewBox="0 0 24 24"
-                  className="animate-pulse"
-                >
-                  <circle cx="12" cy="12" r="4" />
-                  <path d="M12 2v2" />
-                  <path d="M12 20v2" />
-                  <path d="m4.93 4.93 1.41 1.41" />
-                  <path d="m17.66 17.66 1.41 1.41" />
-                  <path d="M2 12h2" />
-                  <path d="M20 12h2" />
-                  <path d="m6.34 17.66-1.41 1.41" />
-                  <path d="m19.07 4.93-1.41 1.41" />
-                </svg>
-              )}
-            </button>
-
-            <button
-              onClick={() => setShowSidebar(true)}
-              className={`p-1.5 rounded-full transition-colors duration-300 ${darkMode
-                ? "bg-[#3a2a7c] hover:bg-[#4a3a9c]"
-                : "bg-[#f0ecfe] hover:bg-[#e5dfff]"
-                }`}
-              aria-label="Open menu"
-            >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#5c3aff] to-[#2b97b8] flex items-center justify-center text-white text-sm font-bold">
-                C
-              </div>
-            </button>
-          </div>
-        </div>
-      </header>
 
       {/* Main Content */}
       <main className="flex-1 relative z-20 max-w-2xl mx-auto w-full py-6 px-4">
@@ -304,7 +239,7 @@ export default function HomePage() {
           }`}>
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#5c3aff] to-[#2b97b8] flex items-center justify-center text-white text-lg font-bold">
-              C
+              {initial}
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
@@ -407,7 +342,9 @@ export default function HomePage() {
             onClick={() => setShowSidebar(true)}
             className="p-2 rounded-full"
           >
-            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#5c3aff] to-[#2b97b8]"></div>
+            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#5c3aff] to-[#2b97b8] flex items-center justify-center text-white text-sm font-bold">
+              {initial}
+            </div>
           </button>
         </div>
       </nav>
@@ -439,7 +376,7 @@ export default function HomePage() {
               <form onSubmit={handleSubmitPost}>
                 <div className="flex gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#5c3aff] to-[#2b97b8] flex items-center justify-center text-white text-sm font-bold">
-                    C
+                    {initial}
                   </div>
                   <div className="flex-1">
                     <textarea
@@ -450,6 +387,7 @@ export default function HomePage() {
                         ? "bg-[#1a1538] border border-[#3a2a7c] text-white focus:ring-[#8c70cc]"
                         : "bg-[#f0ecfe] border border-[#eae6fc] text-gray-900 focus:ring-[#5c3aff]"
                         }`}
+                      maxLength={280}
                     />
                     <p className={`mt-2 text-right text-sm ${darkMode ? "text-gray-400" : "text-gray-500"
                       }`}>
@@ -487,100 +425,14 @@ export default function HomePage() {
       </AnimatePresence>
 
       {/* Sidebar Menu */}
-      <AnimatePresence>
-        {showSidebar && (
-          <div className="fixed inset-0 z-50">
-            {/* Backdrop */}
-            <div
-              className="absolute inset-0 bg-black/50"
-              onClick={() => setShowSidebar(false)}
-            ></div>
+      <Sidebar
+        showSidebar={showSidebar}
+        setShowSidebar={setShowSidebar}
+        darkMode={darkMode}
+        initial={initial}
+        handleLogout={handleLogout}
+      />
 
-            {/* Sidebar Content */}
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className={`absolute top-0 right-0 w-4/5 max-w-sm h-full p-6 shadow-2xl transition-colors duration-300 ${darkMode ? "bg-[#0d0a1f]" : "bg-white"
-                }`}
-            >
-              <div className="flex justify-between items-center mb-8">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#5c3aff] to-[#2b97b8] flex items-center justify-center text-white text-xl font-bold">
-                    C
-                  </div>
-                  <div>
-                    <h3 className="font-bold">Cosmic Explorer</h3>
-                    <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
-                      @current_user
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowSidebar(false)}
-                  className={`p-1 rounded-full ${darkMode ? "hover:bg-[#2a1e5c]" : "hover:bg-[#f0ecfe]"
-                    }`}
-                >
-                  <ArrowLeft size={24} />
-                </button>
-              </div>
-
-              <nav className="space-y-2 mb-8">
-                <a href="#" className={`flex items-center gap-3 p-3 rounded-xl transition-colors duration-300 ${darkMode ? "hover:bg-[#2a1e5c]" : "hover:bg-[#f0ecfe]"
-                  }`}>
-                  <User size={20} />
-                  <span>Profile</span>
-                </a>
-                <a href="#" className={`flex items-center gap-3 p-3 rounded-xl transition-colors duration-300 ${darkMode ? "hover:bg-[#2a1e5c]" : "hover:bg-[#f0ecfe]"
-                  }`}>
-                  <Bookmark size={20} />
-                  <span>Saved Threads</span>
-                </a>
-                <a href="#" className={`flex items-center gap-3 p-3 rounded-xl transition-colors duration-300 ${darkMode ? "hover:bg-[#2a1e5c]" : "hover:bg-[#f0ecfe]"
-                  }`}>
-                  <Settings size={20} />
-                  <span>Settings</span>
-                </a>
-              </nav>
-
-              <div className={`p-4 rounded-xl mb-8 ${darkMode ? "bg-[#1a1538]" : "bg-[#f0ecfe]"
-                }`}>
-                <h4 className="font-bold mb-3">Suggested Accounts</h4>
-                <div className="space-y-4">
-                  {['space_enthusiast', 'astro_photographer', 'cosmic_wanderer'].map((user, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#5c3aff] to-[#2b97b8] flex items-center justify-center text-white text-xs">
-                          {user.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-medium">{user}</p>
-                        </div>
-                      </div>
-                      <button className={`px-3 py-1 rounded-full text-sm font-medium transition-colors duration-300 ${darkMode
-                        ? "bg-[#3a2a7c] hover:bg-[#4a3a9c]"
-                        : "bg-[#5c3aff] text-white"
-                        }`}>
-                        Follow
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                onClick={handleLogout}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl transition-colors duration-300 ${darkMode ? "hover:bg-[#2a1e5c]" : "hover:bg-[#f0ecfe]"
-                  }`}
-              >
-                <LogOut size={20} />
-                <span>Log Out</span>
-              </button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
