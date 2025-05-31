@@ -87,13 +87,13 @@ export default function Signup() {
     }
   };
 
-const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, value, type, checked } = e.target;
-  setFormData((prev) => ({
-    ...prev,
-    [name]: type === "checkbox" ? checked : value,
-  }));
-};
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
 
   return (
@@ -201,16 +201,18 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 onChange={handleChange}
                 className="h-4 w-4 rounded bg-zinc-800 border border-zinc-700"
               />
+
               <label htmlFor="terms">
                 I agree to the{" "}
-                <a href="/terms" className="text-blue-400 hover:underline">
+                <Link href="/terms" className="text-blue-400 hover:underline">
                   terms
-                </a>{" "}
+                </Link>{" "}
                 &{" "}
-                <a href="/privacy" className="text-blue-400 hover:underline">
+                <Link href="/privacy" className="text-blue-400 hover:underline">
                   privacy
-                </a>
+                </Link>
               </label>
+
             </div>
             {errors.terms && <p className="text-sm text-red-500">{errors.terms}</p>}
 

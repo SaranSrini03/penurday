@@ -2,11 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import React from "react";
-import { ArrowLeft, Search, Plus, Heart, MessageSquare, Repeat, Send, MoreVertical, Home, User, Bell, Bookmark, Settings, LogOut } from "lucide-react";
+import {
+  ArrowLeft, Search, Plus, Heart, MessageSquare, Repeat, Send,
+  MoreVertical, Home, Bell
+} from "lucide-react";
+
 import StarfieldBackground from "@/components/StarfieldBackground";
 import NebulaEffects from "@/components/NebulaEffects";
 import { motion, AnimatePresence } from "framer-motion";
-import UserDetails from "@/components/UserDetails";
 import TopNav from "@/components/TopNav";
 import Sidebar from "@/components/SideBar";
 
@@ -161,7 +164,9 @@ export default function HomePage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const initial = <UserDetails detail="username" format="initial" />
+  // const initial = <UserDetails detail="username" format="initial" />
+  const initial = user?.username.charAt(0).toUpperCase() || "";
+
 
 
   if (loading) {

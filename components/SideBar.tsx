@@ -5,7 +5,6 @@ import { ArrowLeft, Bookmark, LogOut, Settings, User } from "lucide-react";
 import React from "react";
 import UserDetails from "@/components/UserDetails"; // Adjust the import path as needed
 import Link from "next/link";
-import { useAuth } from "@/lib/useAuth";
 import { useUser } from "@/context/UserContext";
 
 
